@@ -27,7 +27,7 @@ def add_user():
     new_user = User(name=data['name'])
     db.session.add(new_user)
     db.session.commit()
-    return jsonify({"message": "User added!"}), 201
+    return jsonify({"message": "User added succesfully!"}), 201
 
 # GET /users - Retrieve all users
 @app.route('/users', methods=['GET'])
