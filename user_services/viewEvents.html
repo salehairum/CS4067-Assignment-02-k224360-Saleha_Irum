@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Listings</title>
+    <link rel="stylesheet" href="viewEventsAndBooking.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <div class="sidebar">
+        <i class="fa-solid fa-circle-user"></i>
+        <div class="profile">
+            <h3 id="username">Username</h3>
+            <h3 id="balance">Balance</h3>
+        </div>
+        <div class="profileButtons">
+            <button class="viewBooking">View Booking List</button>
+            <button><i class="fa-solid fa-bell"></i></button>
+        </div>
+    </div>
+    <div class="eventsContainer">
+        <h2>Available Events</h2>
+        <table id="eventsTable">
+            <thead>
+                <tr>
+                    <th>Event Name</th>
+                    <th>Date</th>
+                    <th>Location</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Event data will be inserted here dynamically -->
+            </tbody>
+        </table>
+    </div>
+    <script src="profile.js"></script>
+    <script src="viewEvents.js"></script>
+</body>
+
+</html>

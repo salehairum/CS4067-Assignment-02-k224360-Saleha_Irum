@@ -1,0 +1,90 @@
+body {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #d6ccc2;
+    font-family: Arial, sans-serif;
+    color: #40352f
+}
+
+i.fa-circle-user {
+    font-size: 175px;
+    color: #d6ccc2;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 300px;
+    height: 100vh;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
+.profile {
+    padding-bottom: 50%;
+}
+
+.profileButtons {
+    margin-top: 50%;
+    padding: 15px 20px;
+    background: #cabcb1;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.eventsContainer {
+    margin-left: 270px;
+    width: calc(100% - 270px);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    max-width: 600px;
+    text-align: center;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th,
+td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background: #e3d5ca;
+    color: white;
+}
+
+button {
+    padding: 5px 10px;
+    background: #cabcb1;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #a4988e;
+}

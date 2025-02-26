@@ -1,0 +1,3 @@
+background: #d6ccc2
+button, link: #e3d5ca
+hover: #d5bdaf
