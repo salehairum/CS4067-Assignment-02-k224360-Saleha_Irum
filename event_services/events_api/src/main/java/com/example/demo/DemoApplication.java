@@ -1,3 +1,5 @@
+// run using mvn spring-boot:run
+
 package com.example.demo;
 
 import org.springframework.boot.SpringApplication;
