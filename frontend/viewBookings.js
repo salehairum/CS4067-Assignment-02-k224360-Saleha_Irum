@@ -17,9 +17,9 @@ document.addEventListener("DOMContentLoaded", async function () {
                 <td>${booking.event_id}</td>
                 <td>${booking.status}</td>
                 <td>${createdAt}</td>
-                <td><button onclick="confirmBooking('${booking.id}')">Confirm</button></td>
             `;
 
+            // <td><button onclick="confirmBooking('${booking.id}')">Confirm</button></td>
             bookingsTableBody.appendChild(row);
         });
     } catch (error) {
