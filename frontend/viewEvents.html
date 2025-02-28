@@ -29,6 +29,7 @@
                     <th>Event Name</th>
                     <th>Date</th>
                     <th>Location</th>
+                    <th>Ticket Price</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -36,6 +37,15 @@
                 <!-- Event data will be inserted here dynamically -->
             </tbody>
         </table>
+    </div>
+    <div id="ticketModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Book Tickets</h2>
+            <label for="ticketCount">Enter Number of Tickets:</label>
+            <input type="number" id="ticketCount" min="1" max="10" value="1">
+            <button id="confirmBooking">Confirm</button>
+        </div>
     </div>
     <script src="profile.js"></script>
     <script src="viewEvents.js"></script>

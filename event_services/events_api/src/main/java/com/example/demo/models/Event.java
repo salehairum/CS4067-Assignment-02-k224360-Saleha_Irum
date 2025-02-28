@@ -11,16 +11,18 @@ public class Event {
     private String location;
     private String date;
     private int nTickets;
+    private double ticket_price; // Renamed field
 
     // Constructors
     public Event() {
     }
 
-    public Event(String name, String location, String date, int nTickets) {
+    public Event(String name, String location, String date, int nTickets, double ticket_price) {
         this.name = name;
         this.location = location;
         this.date = date;
         this.nTickets = nTickets;
+        this.ticket_price = ticket_price;
     }
 
     // Getters and Setters
@@ -62,5 +64,13 @@ public class Event {
 
     public void setnTickets(int nTickets) {
         this.nTickets = nTickets;
+    }
+
+    public double getTicket_price() {
+        return ticket_price;
+    }
+
+    public void setTicket_price(double ticket_price) {
+        this.ticket_price = ticket_price;
     }
 }

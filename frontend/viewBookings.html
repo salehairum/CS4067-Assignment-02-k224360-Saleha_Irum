@@ -17,7 +17,7 @@
             <h3 id="balance">Balance</h3>
         </div>
         <div class="profileButtons">
-            <button class="viewBooking">View Booking List</button>
+            <button class="viewEvent">View Event List</button>
             <button><i class="fa-solid fa-bell"></i></button>
         </div>
     </div>
@@ -26,18 +26,20 @@
         <table id="bookingsTable">
             <thead>
                 <tr>
-                    <th>Event Name</th>
-                    <th>Date</th>
-                    <th>Location</th>
-                    <th>Action</th>
+                    <!-- <th>Event Name</th> -->
+                    <th>Event ID</th>
+                    <th>Status</th>
+                    <th>Booked on</th>
+                    <th>Confirm?</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Event data will be inserted here dynamically -->
+                <!-- booking data will be inserted here dynamically -->
             </tbody>
         </table>
     </div>
-    <script src="viewEvents.js"></script>
+    <script src="viewBookings.js"></script>
+    <script src="profile.js"></script>
 </body>
 
 </html>

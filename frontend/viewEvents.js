@@ -1,28 +1,47 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
     const eventsTableBody = document.querySelector("#eventsTable tbody");
 
-    // Dummy event data (replace this with API response later)
-    const dummyEvents = [
-        { id: 1, name: "Tech Conference 2025", date: "2025-03-10", location: "New York" },
-        { id: 2, name: "AI Workshop", date: "2025-04-15", location: "San Francisco" },
-        { id: 3, name: "Game Dev Meetup", date: "2025-05-20", location: "Los Angeles" }
-    ];
+    try {
+        // Call User API instead of Event Service directly
+        const response = await fetch("http://127.0.0.1:8000/users/events/");
+        if (!response.ok) throw new Error("Failed to fetch events");
 
-    dummyEvents.forEach(event => {
-        const row = document.createElement("tr");
+        const events = await response.json();
 
-        row.innerHTML = `
-            <td>${event.name}</td>
-            <td>${event.date}</td>
-            <td>${event.location}</td>
-            <td><button onclick="bookEvent('${event.id}')">Book</button></td>
-        `;
+        events.forEach(event => {
+            const row = document.createElement("tr");
 
-        eventsTableBody.appendChild(row);
-    });
+            row.innerHTML = `
+                <td>${event.name}</td>
+                <td>${event.date}</td>
+                <td>${event.location}</td>
+                <td>${event.ticket_price} Rs</td>
+                <td><button onclick="bookEvent('${event.id}')">Book</button></td>
+            `;
+
+            eventsTableBody.appendChild(row);
+        });
+    } catch (error) {
+        console.error("Error fetching events:", error);
+    }
 });
 
-// Example function to handle booking (for testing)
+document.querySelector(".viewBooking").addEventListener("click", function () {
+    // Construct the URL with query parameters
+    const url = `viewBookings.html?username=${encodeURIComponent(userData.username)}&balance=${encodeURIComponent(userData.balance)}`;
+
+    // Redirect to the new page
+    window.location.href = url;
+});
+
 function bookEvent(eventId) {
-    alert("Booking event ID: " + eventId);
+    console.log("Booking event with ID:", eventId);
+
+    // Open the modal (if using a modal-based approach)
+    const modal = document.getElementById("ticketModal");
+    modal.style.display = "flex";
+    const closeModal = document.querySelector(".close");
+    closeModal.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
 }
