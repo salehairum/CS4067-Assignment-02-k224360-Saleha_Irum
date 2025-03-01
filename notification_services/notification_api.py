@@ -1,39 +1,42 @@
 from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
+from flask_pymongo import PyMongo
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
 
-# SQLite for simplicity (Change to PostgreSQL if needed)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:hellyeah22@localhost/test_db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Configure MongoDB
+app.config["MONGO_URI"] = "mongodb://localhost:27017/notification_service"
+mongo = PyMongo(app)
+notifications = mongo.db.notification  # Collection
 
-db = SQLAlchemy(app)
-
-# User Model
-class User(db.Model):
-    __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100),
-                      nullable=False)
-
-# Create the database
-with app.app_context():
-    db.create_all()
-
-# POST /users - Add a new user
-@app.route('/users', methods=['POST'])
-def add_user():
+# POST: Add a new notification
+@app.route("/notifications", methods=["POST"])
+def add_notification():
     data = request.json
-    new_user = User(name=data['name'])
-    db.session.add(new_user)
-    db.session.commit()
-    return jsonify({"message": "User added!"}), 201
+    if not data or "booking_id" not in data or "user_id" not in data:
+        return jsonify({"error": "Missing booking_id or user_id"}), 400
 
-# GET /users - Retrieve all users
-@app.route('/users', methods=['GET'])
-def get_users():
-    users = User.query.all()
-    return jsonify([{"id": user.id, "name": user.name} for user in users])
+    notification_id = notifications.insert_one({
+        "booking_id": data["booking_id"],
+        "user_id": data["user_id"]
+    }).inserted_id
 
-if __name__ == '__main__':
+    return jsonify({"message": "Notification added", "id": str(notification_id)}), 201
+
+# GET: Retrieve all notifications (or filter by user_id)
+@app.route("/notifications/<user_id>", methods=["GET"])
+def get_notifications_by_user(user_id):
+    # Find all notifications for the given user_id
+    
+    notifications_list = notifications.find({"user_id": user_id})
+
+    # Convert MongoDB documents to JSON format
+    result = [
+        {"booking_id": n["booking_id"], "user_id": n["user_id"]}
+        for n in notifications_list
+    ]
+
+    return jsonify(result), 200
+
+if __name__ == "__main__":
     app.run(debug=True)

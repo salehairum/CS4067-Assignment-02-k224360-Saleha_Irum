@@ -43,6 +43,11 @@ class LoginRequest(BaseModel):
     username: str
     password: str
 
+class BookingRequest(BaseModel):
+    event_id: int
+    user_id: int
+    price: int
+
 #handle get at users
 @app.get("/users/")
 async def get_users(db: AsyncSession = Depends(get_db)):
@@ -104,3 +109,40 @@ async def get_events():
         raise HTTPException(status_code=e.response.status_code, detail="Error retrieving events")
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal Server Error")
+
+@app.post("/users/bookings/")
+async def create_booking(booking: BookingRequest, db: AsyncSession = Depends(get_db)):
+    # Step 1: Get User from Database
+    print(f"Received booking request: {booking.dict()}")  # Log request
+    result = await db.execute(select(User).where(User.id == booking.user_id))
+    db_user = result.scalars().first()
+
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Step 2: Check User Balance
+    if db_user.balance < booking.price:
+        raise HTTPException(status_code=400, detail="Insufficient balance")
+
+    # Step 3: Call Booking API to Create Booking
+    try:
+        async with httpx.AsyncClient() as client:
+            booking_response = await client.post(
+                "http://127.0.0.1:5000/bookings", json=booking.dict()
+            )
+            booking_response.raise_for_status()
+            booking_data = booking_response.json()
+    except httpx.HTTPStatusError as e:
+        raise HTTPException(status_code=e.response.status_code, detail="Booking API error")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error creating booking")
+
+    # Step 4: Deduct Balance After Successful Booking
+    db_user.balance -= booking.price
+    await db.commit()
+
+    return {
+        "message": "Booking successful",
+        "booking_id": booking_data["booking_id"],
+        "remaining_balance": db_user.balance
+    }

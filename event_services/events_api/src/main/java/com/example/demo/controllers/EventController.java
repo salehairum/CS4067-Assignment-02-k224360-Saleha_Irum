@@ -3,12 +3,15 @@ package com.example.demo.controllers;
 import com.example.demo.models.Event;
 import com.example.demo.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/events")
+@CrossOrigin(origins = "http://127.0.0.1:5500") // Allow frontend requests
 public class EventController {
 
     @Autowired
@@ -42,5 +45,14 @@ public class EventController {
     @DeleteMapping("/{id}")
     public void deleteEvent(@PathVariable int id) {
         eventService.deleteEvent(id);
+    }
+
+    @GetMapping("/{id}/price")
+    public double getEventTicketPrice(@PathVariable int id) {
+        Event event = eventService.getEventById(id);
+        if (event == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
+        }
+        return event.getTicket_price();
     }
 }
