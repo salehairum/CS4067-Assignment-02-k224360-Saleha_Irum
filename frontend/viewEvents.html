@@ -25,22 +25,25 @@
             </button>
         </div>
     </div>
-    <div class="eventsContainer">
-        <h2>Available Events</h2>
-        <table id="eventsTable">
-            <thead>
-                <tr>
-                    <th>Event Name</th>
-                    <th>Date</th>
-                    <th>Location</th>
-                    <th>Ticket Price</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Event data will be inserted here dynamically -->
-            </tbody>
-        </table>
+    <div class="mainContainer">
+        <h2 class="loadingMsg">Loading...</h2>
+        <div class="eventsContainer">
+            <h2>Available Events</h2>
+            <table id="eventsTable">
+                <thead>
+                    <tr>
+                        <th>Event Name</th>
+                        <th>Date</th>
+                        <th>Location</th>
+                        <th>Ticket Price</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Event data will be inserted here dynamically -->
+                </tbody>
+            </table>
+        </div>
     </div>
     <div id="ticketModal" class="modal">
         <div class="modal-content">
@@ -49,6 +52,7 @@
             <label for="ticketCount">Enter Number of Tickets:</label>
             <input type="number" id="ticketCount" min="1" max="10" value="1">
             <button id="confirmBooking">Confirm</button>
+            <h3 id="processBooking">Processing...</h3>
         </div>
     </div>
     <script src="sidebar.js"></script>

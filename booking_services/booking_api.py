@@ -45,7 +45,14 @@ def create_booking():
     if response.status_code != 200 or not response.json():  
         return jsonify({"error": "Not enough tickets available"}), 400
 
-    # Step 2: Proceed with Booking
+    # Step 2: Verify Payment
+    payment_api_url = "http://localhost:5002/verify-payment"
+    payment_response = requests.post(payment_api_url, json={"user_id": data['user_id'], "amount": data.get("price", 0)})
+
+    if payment_response.status_code != 200:
+        return jsonify({"error": "Payment failed"}), 400
+
+    # Step 3: Proceed with Booking
     new_booking = Booking(user_id=data['user_id'], event_id=event_id)
     db.session.add(new_booking)
     db.session.commit()
@@ -91,6 +98,27 @@ def get_bookings_by_user(user_id):
     ]
 
     return jsonify(user_bookings), 200
+
+# Route to update the status of a booking
+@app.route('/bookings/<int:booking_id>/status', methods=['PATCH'])
+def update_booking_status(booking_id):
+    data = request.get_json()
+    
+    # Ensure the request contains a 'status' field
+    if not data or "status" not in data:
+        return jsonify({"error": "Missing 'status' field"}), 400
+
+    # Find the booking in the database
+    booking = Booking.query.get(booking_id)
+
+    if not booking:
+        return jsonify({"error": "Booking not found"}), 404
+
+    # Update the booking status
+    booking.status = data["status"]
+    db.session.commit()
+
+    return jsonify({"message": "Booking status updated successfully"}), 200
 
 def publish_notification(user_id, booking_id):
     # Connect to RabbitMQ

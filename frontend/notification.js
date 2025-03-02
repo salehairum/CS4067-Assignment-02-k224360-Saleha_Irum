@@ -51,6 +51,14 @@ function removeNotification(element) {
             if (data.message === "Notification deleted successfully") {
                 notification.remove();
                 updateNoNotificationsMessage();
+
+                return fetch(`http://localhost:5000/bookings/${bookingId}/status`, { // Assuming booking API is on port 5002
+                    method: "PATCH", // Or "PUT" if your API requires that
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ status: "confirmed" }) // Update status to "confirmed"
+                });
             } else {
                 console.error("Failed to delete notification:", data.error);
             }

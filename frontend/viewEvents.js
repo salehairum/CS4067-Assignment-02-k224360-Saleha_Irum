@@ -15,6 +15,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         const events = await response.json();
 
+        document.querySelector(".loadingMsg").style.display = "none";
+
         events.forEach(event => {
             const row = document.createElement("tr");
 
@@ -62,7 +64,7 @@ async function fetchNotificationCount(userId) {
 document.querySelector(".viewBooking").addEventListener("click", function () { openNewPage("viewBookings"); });
 document.querySelector(".notification-btn").addEventListener("click", function () { openNewPage("notifications"); });
 
-const userId = parseInt(userData.id, 10);
+const userId = parseInt(getUserId().id, 10);
 fetchNotificationCount(userId);
 function openNewPage(pageName) {
     const id = parseInt(getUserId().id, 10);
@@ -104,6 +106,8 @@ async function getTicketPrice(eventId) {
 }
 
 async function confirmBooking(eventId) {
+    document.getElementById("processBooking").style.display = "flex";
+
     const ticketCount = document.getElementById("ticketCount").value;
 
     if (ticketCount < 1) {

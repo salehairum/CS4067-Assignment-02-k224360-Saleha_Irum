@@ -25,7 +25,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                 <td>${booking.event_id}</td>
                 <td>${booking.status}</td>
                 <td>${createdAt}</td>
-                <td><button onclick="confirmBooking('${booking.id}')">Confirm</button></td>
             `;
 
             bookingsTableBody.appendChild(row);
@@ -38,6 +37,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 function updateNotificationCount(count) {
     const notifBadge = document.querySelector('.notification-count');
+    console.log("atey tou hain");
     if (count > 0) {
         notifBadge.textContent = count;
         notifBadge.style.display = "flex";
@@ -63,7 +63,7 @@ async function fetchNotificationCount(userId) {
 document.querySelector(".viewEvent").addEventListener("click", function () { openNewPage("viewEvents"); });
 document.querySelector(".notification-btn").addEventListener("click", function () { openNewPage("notifications"); });
 
-const userId = parseInt(userData.id, 10);
+const userId = parseInt(getUserId().id, 10);
 fetchNotificationCount(userId);
 function openNewPage(pageName) {
     const id = parseInt(getUserId().id, 10);
