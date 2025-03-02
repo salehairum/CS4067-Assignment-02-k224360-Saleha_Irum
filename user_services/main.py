@@ -47,6 +47,7 @@ class BookingRequest(BaseModel):
     event_id: int
     user_id: int
     price: int
+    ticket_count: int
 
 #handle get at users
 @app.get("/users/")
@@ -133,9 +134,15 @@ async def create_booking(booking: BookingRequest, db: AsyncSession = Depends(get
             booking_response.raise_for_status()
             booking_data = booking_response.json()
     except httpx.HTTPStatusError as e:
-        raise HTTPException(status_code=e.response.status_code, detail="Booking API error")
+        if e.response is not None:
+            error_json = e.response.json()  # Get error response as dict
+            error_message = error_json.get("error", str(error_json))  # Extract error field if it exists
+        else:
+            error_message = "Booking API error"
+    
+        raise HTTPException(status_code=e.response.status_code, detail=error_message)
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Error creating booking")
+        raise HTTPException(status_code=500, detail=str(e))
 
     # Step 4: Deduct Balance After Successful Booking
     db_user.balance -= booking.price

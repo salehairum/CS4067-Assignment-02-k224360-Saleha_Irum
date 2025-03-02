@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_cors import CORS
+import requests
 
 app = Flask(__name__)
 
@@ -31,9 +32,22 @@ with app.app_context():
 @app.route('/bookings', methods=['POST'])
 def create_booking():
     data = request.get_json()
-    new_booking = Booking(user_id=data['user_id'], event_id=data['event_id'])
+    
+    event_id = data['event_id']
+    requested_tickets = data['ticket_count']  # New field
+
+    # Step 1: Check and Reserve Tickets in Event API
+    event_api_url = f"http://localhost:8080/api/events/{event_id}/reserve-tickets"
+    response = requests.post(event_api_url, json={"requestedTickets": requested_tickets})
+
+    if response.status_code != 200 or not response.json():  
+        return jsonify({"error": "Not enough tickets available"}), 400
+
+    # Step 2: Proceed with Booking
+    new_booking = Booking(user_id=data['user_id'], event_id=event_id)
     db.session.add(new_booking)
     db.session.commit()
+
     return jsonify({"message": "Booking created", "booking_id": new_booking.id}), 201
 
 # Route to get all bookings

@@ -9,7 +9,7 @@ import java.util.List;
 
 @Service
 public class EventService {
-    
+
     @Autowired
     private EventRepository eventRepository;
 
@@ -40,5 +40,12 @@ public class EventService {
     // Delete an event by ID
     public void deleteEvent(int id) {
         eventRepository.deleteById(id);
+    }
+
+    public Event updateEvent(Event event) {
+        if (eventRepository.existsById(event.getId())) {
+            return eventRepository.save(event); // Save updated event
+        }
+        return null; // Return null if event doesn't exist
     }
 }

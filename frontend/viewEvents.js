@@ -88,13 +88,7 @@ async function confirmBooking(eventId) {
         }
 
         const totalCost = ticketPrice * ticketCount;
-        const id = parseInt(getUserId().id, 10); // Ensure it's an integer
-        console.log("Sending request:", JSON.stringify({
-            event_id: eventId,
-            user_id: id,
-            price: totalCost
-        }));
-
+        const id = parseInt(getUserId().id, 10);
         const response = await fetch("http://127.0.0.1:8000/users/bookings/", {
             method: "POST",
             headers: {
@@ -103,7 +97,8 @@ async function confirmBooking(eventId) {
             body: JSON.stringify({
                 event_id: eventId,
                 user_id: id,
-                price: totalCost
+                price: totalCost,
+                ticket_count: ticketCount
             })
         });
 

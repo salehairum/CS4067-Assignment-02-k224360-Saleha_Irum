@@ -6,4 +6,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface EventRepository extends MongoRepository<Event, Integer> {
     // Custom query method to find an event by name
     Event findByName(String name);
+
+    boolean existsById(int id);
 }

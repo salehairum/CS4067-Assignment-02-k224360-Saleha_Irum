@@ -1,3 +1,5 @@
+//mvn spring-boot:run
+
 package com.example.demo.controllers;
 
 import com.example.demo.models.Event;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/events")
@@ -55,4 +58,26 @@ public class EventController {
         }
         return event.getTicket_price();
     }
+
+    @PostMapping("/{id}/reserve-tickets")
+    public boolean reserveTickets(@PathVariable int id, @RequestBody Map<String, Integer> requestBody) {
+        int requestedTickets = requestBody.get("requestedTickets");
+        Event event = eventService.getEventById(id);
+        if (event == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
+        }
+
+        synchronized (this) { // Prevent race conditions
+            if (event.getnTickets() < requestedTickets) {
+                return false; // Not enough tickets
+            }
+
+            // Deduct tickets and update event
+            event.setnTickets(event.getnTickets() - requestedTickets);
+            eventService.updateEvent(event);
+        }
+
+        return true; // Booking can proceed
+    }
+
 }
