@@ -106,7 +106,7 @@ async function getTicketPrice(eventId) {
 }
 
 async function confirmBooking(eventId) {
-    document.getElementById("processBooking").style.display = "flex";
+    document.getElementById("processBooking").style.display = "block";
 
     const ticketCount = document.getElementById("ticketCount").value;
 

@@ -1,5 +1,4 @@
-#running on http://127.0.0.1:5000
-
+import logging
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -8,8 +7,16 @@ import requests
 import pika
 import json
 
-app = Flask(__name__)
+# Configure logging
+logging.basicConfig(
+    filename="booking_service.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+)
+logger = logging.getLogger("BookingService")
 
+app = Flask(__name__)
 CORS(app, origins=["http://127.0.0.1:5500"])
 
 # Configure PostgreSQL database
@@ -34,28 +41,37 @@ with app.app_context():
 @app.route('/bookings', methods=['POST'])
 def create_booking():
     data = request.get_json()
-    
     event_id = data['event_id']
-    requested_tickets = data['ticket_count']  # New field
+    requested_tickets = data['ticket_count']
+
+    logger.info(f"Received booking request for event {event_id} by user {data['user_id']}")
 
     # Step 1: Check and Reserve Tickets in Event API
     event_api_url = f"http://localhost:8080/api/events/{event_id}/reserve-tickets"
     response = requests.post(event_api_url, json={"requestedTickets": requested_tickets})
 
-    if response.status_code != 200 or not response.json():  
+    if response.status_code != 200 or not response.json():
+        logger.warning(f"Ticket reservation failed for event {event_id}")
         return jsonify({"error": "Not enough tickets available"}), 400
+
+    logger.info(f"Successfully reserved {requested_tickets} tickets for event {event_id}")
 
     # Step 2: Verify Payment
     payment_api_url = "http://localhost:5002/verify-payment"
     payment_response = requests.post(payment_api_url, json={"user_id": data['user_id'], "amount": data.get("price", 0)})
 
     if payment_response.status_code != 200:
+        logger.warning(f"Payment verification failed for user {data['user_id']}")
         return jsonify({"error": "Payment failed"}), 400
+
+    logger.info(f"Payment successful for user {data['user_id']}")
 
     # Step 3: Proceed with Booking
     new_booking = Booking(user_id=data['user_id'], event_id=event_id)
     db.session.add(new_booking)
     db.session.commit()
+
+    logger.info(f"Booking created with ID {new_booking.id} for user {data['user_id']}")
 
     publish_notification(data['user_id'], new_booking.id)
 
@@ -64,6 +80,7 @@ def create_booking():
 # Route to get all bookings
 @app.route('/bookings', methods=['GET'])
 def get_all_bookings():
+    logger.info("Fetching all bookings")
     bookings = Booking.query.all()
     all_bookings = [
         {
@@ -75,15 +92,17 @@ def get_all_bookings():
         }
         for booking in bookings
     ]
-    
+    logger.debug(f"Total bookings fetched: {len(all_bookings)}")
     return jsonify(all_bookings), 200
 
 # Route to get all bookings for a specific user
 @app.route('/bookings/user/<int:user_id>', methods=['GET'])
 def get_bookings_by_user(user_id):
+    logger.info(f"Fetching bookings for user {user_id}")
     bookings = Booking.query.filter_by(user_id=user_id).all()
 
     if not bookings:
+        logger.warning(f"No bookings found for user {user_id}")
         return jsonify({"message": "No bookings found for this user"}), 404
 
     user_bookings = [
@@ -97,45 +116,44 @@ def get_bookings_by_user(user_id):
         for booking in bookings
     ]
 
+    logger.debug(f"User {user_id} has {len(user_bookings)} bookings")
     return jsonify(user_bookings), 200
 
 # Route to update the status of a booking
 @app.route('/bookings/<int:booking_id>/status', methods=['PATCH'])
 def update_booking_status(booking_id):
     data = request.get_json()
-    
-    # Ensure the request contains a 'status' field
+
     if not data or "status" not in data:
+        logger.warning("Invalid booking status update request")
         return jsonify({"error": "Missing 'status' field"}), 400
 
-    # Find the booking in the database
     booking = Booking.query.get(booking_id)
 
     if not booking:
+        logger.warning(f"Booking ID {booking_id} not found for status update")
         return jsonify({"error": "Booking not found"}), 404
 
-    # Update the booking status
     booking.status = data["status"]
     db.session.commit()
 
+    logger.info(f"Updated booking {booking_id} status to {data['status']}")
     return jsonify({"message": "Booking status updated successfully"}), 200
 
 def publish_notification(user_id, booking_id):
-    # Connect to RabbitMQ
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-    channel = connection.channel()
+    try:
+        connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+        channel = connection.channel()
+        channel.queue_declare(queue='notifications')
 
-    # Declare a queue (ensures the queue exists)
-    channel.queue_declare(queue='notifications')
+        message = json.dumps({"user_id": user_id, "booking_id": booking_id})
+        channel.basic_publish(exchange='', routing_key='notifications', body=message)
 
-    # Create the message
-    message = json.dumps({"user_id": user_id, "booking_id": booking_id})
+        connection.close()
+        logger.info(f"Notification sent for booking {booking_id} to user {user_id}")
 
-    # Send the message to the queue
-    channel.basic_publish(exchange='', routing_key='notifications', body=message)
-
-    # Close the connection
-    connection.close()
+    except Exception as e:
+        logger.error(f"Failed to send notification for booking {booking_id}: {e}")
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(debug=True)
