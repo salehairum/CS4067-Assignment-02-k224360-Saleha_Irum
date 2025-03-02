@@ -1,8 +1,11 @@
 from flask import Flask, request, jsonify
 from flask_pymongo import PyMongo
+from flask_cors import CORS
 from bson.objectid import ObjectId
 
 app = Flask(__name__)
+
+CORS(app, origins=["http://127.0.0.1:5500"])
 
 # Configure MongoDB
 app.config["MONGO_URI"] = "mongodb://localhost:27017/notification_service"
@@ -38,5 +41,23 @@ def get_notifications_by_user(user_id):
 
     return jsonify(result), 200
 
+@app.route("/notifications/<user_id>/count", methods=["GET"])
+def get_notification_count(user_id):
+    # Count the number of notifications for the given user_id
+    count = notifications.count_documents({"user_id": user_id})
+
+    # Return the count as a JSON response
+    return jsonify({"notification_count": count}), 200
+
+@app.route("/notifications/delete/<booking_id>", methods=["DELETE"])
+def delete_notification(booking_id):
+    # Attempt to delete the notification with the specified booking_id
+    result = notifications.delete_one({"booking_id": booking_id})
+
+    if result.deleted_count > 0:
+        return jsonify({"message": "Notification deleted successfully"}), 200
+    else:
+        return jsonify({"error": "Notification not found"}), 404
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(port=5001,debug=True)

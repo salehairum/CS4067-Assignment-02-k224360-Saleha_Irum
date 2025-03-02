@@ -36,13 +36,14 @@ document.addEventListener("DOMContentLoaded", async function () {
 });
 
 
-document.querySelector(".viewEvent").addEventListener("click", function () {
-    // Construct the URL with query parameters
+document.querySelector(".viewEvent").addEventListener("click", function () { openNewPage("viewEvents"); });
+document.querySelector(".notification-btn").addEventListener("click", function () { openNewPage("notifications"); });
+
+function openNewPage(pageName) {
     const id = parseInt(getUserId().id, 10);
     // Construct the URL with query parameters
-    const url = `viewEvents.html?username=${encodeURIComponent(userData.username)}&balance=${encodeURIComponent(userData.balance)}&id=${encodeURIComponent(id)}`;
+    const url = `${pageName}.html?username=${encodeURIComponent(userData.username)}&balance=${encodeURIComponent(userData.balance)}&id=${encodeURIComponent(id)}`;
 
     // Redirect to the new page
     window.location.href = url;
-});
-
+}

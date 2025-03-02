@@ -33,15 +33,17 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 });
 
-document.querySelector(".viewBooking").addEventListener("click", function () {
+document.querySelector(".viewBooking").addEventListener("click", function () { openNewPage("viewBookings"); });
+document.querySelector(".notification-btn").addEventListener("click", function () { openNewPage("notifications"); });
 
+function openNewPage(pageName) {
     const id = parseInt(getUserId().id, 10);
     // Construct the URL with query parameters
-    const url = `viewBookings.html?username=${encodeURIComponent(userData.username)}&balance=${encodeURIComponent(userData.balance)}&id=${encodeURIComponent(id)}`;
+    const url = `${pageName}.html?username=${encodeURIComponent(userData.username)}&balance=${encodeURIComponent(userData.balance)}&id=${encodeURIComponent(id)}`;
 
     // Redirect to the new page
     window.location.href = url;
-});
+}
 
 function bookEvent(eventId) {
     console.log("Booking event with ID:", eventId);
