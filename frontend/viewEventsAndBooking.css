@@ -12,6 +12,9 @@ body {
 
 .eventsContainer,
 .bookingContainer {
+    max-height: 500px;
+    /* Adjust as needed */
+    overflow-y: auto;
     margin-left: 270px;
     width: calc(100% - 270px);
     background: white;

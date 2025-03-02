@@ -5,6 +5,8 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_cors import CORS
 import requests
+import pika
+import json
 
 app = Flask(__name__)
 
@@ -48,6 +50,8 @@ def create_booking():
     db.session.add(new_booking)
     db.session.commit()
 
+    publish_notification(data['user_id'], new_booking.id)
+
     return jsonify({"message": "Booking created", "booking_id": new_booking.id}), 201
 
 # Route to get all bookings
@@ -87,6 +91,23 @@ def get_bookings_by_user(user_id):
     ]
 
     return jsonify(user_bookings), 200
+
+def publish_notification(user_id, booking_id):
+    # Connect to RabbitMQ
+    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    channel = connection.channel()
+
+    # Declare a queue (ensures the queue exists)
+    channel.queue_declare(queue='notifications')
+
+    # Create the message
+    message = json.dumps({"user_id": user_id, "booking_id": booking_id})
+
+    # Send the message to the queue
+    channel.basic_publish(exchange='', routing_key='notifications', body=message)
+
+    # Close the connection
+    connection.close()
 
 if __name__ == '__main__':
     app.run(debug=True) 

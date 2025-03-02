@@ -81,8 +81,9 @@ document.querySelector(".viewBooking").addEventListener("click", function () { o
 
 function openNewPage(pageName) {
     const id = parseInt(getUserId().id, 10);
+    const balance = document.getElementById("balance").textContent.split(": ")[1];
     // Construct the URL with query parameters
-    const url = `${pageName}.html?username=${encodeURIComponent(userData.username)}&balance=${encodeURIComponent(userData.balance)}&id=${encodeURIComponent(id)}`;
+    const url = `${pageName}.html?username=${encodeURIComponent(userData.username)}&balance=${encodeURIComponent(balance)}&id=${encodeURIComponent(id)}`;
 
     // Redirect to the new page
     window.location.href = url;

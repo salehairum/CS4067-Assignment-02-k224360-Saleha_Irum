@@ -33,13 +33,42 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 });
 
+
+
+function updateNotificationCount(count) {
+    const notifBadge = document.querySelector('.notification-count');
+    if (count > 0) {
+        notifBadge.textContent = count;
+        notifBadge.style.display = "flex";
+    } else {
+        notifBadge.style.display = "none";
+    }
+}
+
+async function fetchNotificationCount(userId) {
+    try {
+        const response = await fetch(`http://127.0.0.1:5001/notifications/${userId}/count`);
+        if (!response.ok) {
+            throw new Error("Failed to fetch notification count");
+        }
+
+        const data = await response.json();
+        updateNotificationCount(data.notification_count);
+    } catch (error) {
+        console.error("Error fetching notification count:", error);
+    }
+}
+
 document.querySelector(".viewBooking").addEventListener("click", function () { openNewPage("viewBookings"); });
 document.querySelector(".notification-btn").addEventListener("click", function () { openNewPage("notifications"); });
 
+const userId = parseInt(userData.id, 10);
+fetchNotificationCount(userId);
 function openNewPage(pageName) {
     const id = parseInt(getUserId().id, 10);
+    const balance = document.getElementById("balance").textContent.split(": ")[1];
     // Construct the URL with query parameters
-    const url = `${pageName}.html?username=${encodeURIComponent(userData.username)}&balance=${encodeURIComponent(userData.balance)}&id=${encodeURIComponent(id)}`;
+    const url = `${pageName}.html?username=${encodeURIComponent(userData.username)}&balance=${encodeURIComponent(balance)}&id=${encodeURIComponent(id)}`;
 
     // Redirect to the new page
     window.location.href = url;
@@ -111,6 +140,8 @@ async function confirmBooking(eventId) {
         document.getElementById("ticketModal").style.display = "none";
 
         document.getElementById("balance").textContent = "Balance: " + result.remaining_balance;
+
+        fetchNotificationCount(id);
     } catch (error) {
         alert("Error: " + error.message);
     }

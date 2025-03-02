@@ -29,6 +29,11 @@ def add_notification():
 # GET: Retrieve all notifications (or filter by user_id)
 @app.route("/notifications/<user_id>", methods=["GET"])
 def get_notifications_by_user(user_id):
+    try:
+        user_id = int(user_id)
+    except ValueError:
+        return jsonify({"error": "Invalid user_id format"}), 400
+
     # Find all notifications for the given user_id
     
     notifications_list = notifications.find({"user_id": user_id})
@@ -43,6 +48,11 @@ def get_notifications_by_user(user_id):
 
 @app.route("/notifications/<user_id>/count", methods=["GET"])
 def get_notification_count(user_id):
+    try:
+        user_id = int(user_id)
+    except ValueError:
+        return jsonify({"error": "Invalid user_id format"}), 400
+
     # Count the number of notifications for the given user_id
     count = notifications.count_documents({"user_id": user_id})
 
@@ -51,6 +61,11 @@ def get_notification_count(user_id):
 
 @app.route("/notifications/delete/<booking_id>", methods=["DELETE"])
 def delete_notification(booking_id):
+    try:
+        booking_id = int(booking_id)
+    except ValueError:
+        return jsonify({"error": "Invalid booking_id format"}), 400
+
     # Attempt to delete the notification with the specified booking_id
     result = notifications.delete_one({"booking_id": booking_id})
 
