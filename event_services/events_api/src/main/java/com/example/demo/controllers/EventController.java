@@ -2,6 +2,11 @@ package com.example.demo.controllers;
 
 import com.example.demo.models.Event;
 import com.example.demo.services.EventService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +21,14 @@ import java.util.Map;
 @RequestMapping("/api/events")
 @CrossOrigin(origins = "http://127.0.0.1:5500") // Allow frontend requests
 public class EventController {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(EventController.class);
-    
+
     @Autowired
     private EventService eventService;
 
-    // Get all events
+    @Operation(summary = "Retrieve all events")
+    @ApiResponse(responseCode = "200", description = "List of events", content = @Content(schema = @Schema(implementation = Event.class)))
     @GetMapping
     public List<Event> getAllEvents() {
         logger.info("Fetching all events");
@@ -31,7 +37,11 @@ public class EventController {
         return events;
     }
 
-    // Get event by ID
+    @Operation(summary = "Retrieve an event by ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Event found", content = @Content(schema = @Schema(implementation = Event.class))),
+            @ApiResponse(responseCode = "404", description = "Event not found")
+    })
     @GetMapping("/{id}")
     public Event getEventById(@PathVariable int id) {
         logger.info("Fetching event with ID: {}", id);
@@ -40,11 +50,14 @@ public class EventController {
             logger.warn("Event with ID {} not found", id);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
         }
-        logger.debug("Event retrieved: {}", event);
         return event;
     }
 
-    // Get event by name
+    @Operation(summary = "Retrieve an event by name")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Event found", content = @Content(schema = @Schema(implementation = Event.class))),
+            @ApiResponse(responseCode = "404", description = "Event not found")
+    })
     @GetMapping("/name/{name}")
     public Event getEventByName(@PathVariable String name) {
         logger.info("Fetching event with name: {}", name);
@@ -53,27 +66,30 @@ public class EventController {
             logger.warn("Event with name {} not found", name);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
         }
-        logger.debug("Event retrieved: {}", event);
         return event;
     }
 
-    // Add new event
+    @Operation(summary = "Add a new event")
+    @ApiResponse(responseCode = "201", description = "Event created", content = @Content(schema = @Schema(implementation = Event.class)))
     @PostMapping
     public Event addEvent(@RequestBody Event event) {
         logger.info("Adding new event: {}", event);
-        Event createdEvent = eventService.addEvent(event);
-        logger.debug("Event added successfully: {}", createdEvent);
-        return createdEvent;
+        return eventService.addEvent(event);
     }
 
-    // Delete event by ID
+    @Operation(summary = "Delete an event by ID")
+    @ApiResponse(responseCode = "200", description = "Event deleted")
     @DeleteMapping("/{id}")
     public void deleteEvent(@PathVariable int id) {
         logger.info("Deleting event with ID: {}", id);
         eventService.deleteEvent(id);
-        logger.debug("Event with ID {} deleted successfully", id);
     }
 
+    @Operation(summary = "Get ticket price for an event")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ticket price retrieved"),
+            @ApiResponse(responseCode = "404", description = "Event not found")
+    })
     @GetMapping("/{id}/price")
     public double getEventTicketPrice(@PathVariable int id) {
         logger.info("Fetching ticket price for event ID: {}", id);
@@ -82,16 +98,20 @@ public class EventController {
             logger.warn("Event with ID {} not found", id);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
         }
-        double price = event.getTicket_price();
-        logger.debug("Ticket price for event {}: {}", id, price);
-        return price;
+        return event.getTicket_price();
     }
 
+    @Operation(summary = "Reserve tickets for an event")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Tickets reserved successfully"),
+            @ApiResponse(responseCode = "404", description = "Event not found"),
+            @ApiResponse(responseCode = "400", description = "Not enough tickets available")
+    })
     @PostMapping("/{id}/reserve-tickets")
     public boolean reserveTickets(@PathVariable int id, @RequestBody Map<String, Integer> requestBody) {
         int requestedTickets = requestBody.get("requestedTickets");
         logger.info("Reserving {} tickets for event ID: {}", requestedTickets, id);
-        
+
         Event event = eventService.getEventById(id);
         if (event == null) {
             logger.warn("Event with ID {} not found", id);
@@ -100,16 +120,14 @@ public class EventController {
 
         synchronized (this) { // Prevent race conditions
             if (event.getnTickets() < requestedTickets) {
-                logger.warn("Not enough tickets available for event ID: {}. Requested: {}, Available: {}", id, requestedTickets, event.getnTickets());
-                return false;
+                logger.warn("Not enough tickets available for event ID: {}", id);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not enough tickets available");
             }
-
-            // Deduct tickets and update event
             event.setnTickets(event.getnTickets() - requestedTickets);
             eventService.updateEvent(event);
             logger.info("Successfully reserved {} tickets for event ID: {}", requestedTickets, id);
         }
 
-        return true; // Booking can proceed
+        return true;
     }
 }
