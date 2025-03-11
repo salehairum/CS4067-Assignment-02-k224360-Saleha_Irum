@@ -9,7 +9,7 @@
 - Communications: REST API(Sync), RabbitMQ(Async)
 
 ## API Documentation
-- User Service: http://127.0.0.1:8000/
+- User Service: http://127.0.0.1:8000/docs
 - Event Service: http://localhost:8080/swagger-ui/index.html
 - Booking Service: http://127.0.0.1:5000/
 - Notification Service: http://127.0.0.1:5001/
