@@ -14,11 +14,11 @@ logging.basicConfig(
 )
 
 app = Flask(__name__)
-CORS(app, origins=["http://127.0.0.1:5500"])
+CORS(app, origins=["http://localhost:5500", "http://frontend:5500"])
 api = Api(app, title="Notification Service API", description="API for managing notifications", doc="/")
 
 # Configure MongoDB
-app.config["MONGO_URI"] = "mongodb://localhost:27017/notification_service"
+app.config["MONGO_URI"] = "mongodb://mongodb:27017/notification_service"
 mongo = PyMongo(app)
 notifications = mongo.db.notification  # Collection
 
@@ -94,6 +94,6 @@ class DeleteNotification(Resource):
             logging.warning(f"Notification with booking_id {booking_id} not found")
             return {"error": "Notification not found"}, 404
 
+
 if __name__ == "__main__":
-    logging.info("Starting Notification Service on port 5001...")
-    app.run(port=5001, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

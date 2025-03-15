@@ -40,7 +40,7 @@ function removeNotification(element) {
     }
 
     // Make DELETE request to API
-    fetch(`http://localhost:5001/notifications/delete/${bookingId}`, {
+    fetch(`http://notification_service:5001/notifications/delete/${bookingId}`, {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json"
@@ -52,8 +52,8 @@ function removeNotification(element) {
                 notification.remove();
                 updateNoNotificationsMessage();
 
-                return fetch(`http://localhost:5000/bookings/${bookingId}/status`, { // Assuming booking API is on port 5002
-                    method: "PATCH", // Or "PUT" if your API requires that
+                return fetch(`http://booking_service:5000/bookings/${bookingId}/status`, {
+                    method: "PATCH", 
                     headers: {
                         "Content-Type": "application/json"
                     },
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     try {
         const id = parseInt(getUserId().id, 10);
-        const response = await fetch(`http://127.0.0.1:5001/notifications/${id}`);
+        const response = await fetch(`http://notification_service:5001/notifications/${id}`);
         if (!response.ok) throw new Error("Failed to fetch notifications");
 
         const notifs = await response.json();

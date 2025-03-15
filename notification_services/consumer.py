@@ -1,6 +1,7 @@
 import pika
 import json
 from pymongo import MongoClient
+import os
 
 # Connect to MongoDB
 client = MongoClient("mongodb://localhost:27017/")
@@ -8,7 +9,11 @@ db = client["notification_service"]
 notifications = db["notification"]
 
 # Connect to RabbitMQ
-connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+rabbitmq_host = os.getenv("RABBITMQ_HOST", "rabbitmq")
+rabbitmq_port = int(os.getenv("RABBITMQ_PORT", 5672))
+connection = pika.BlockingConnection(
+    pika.ConnectionParameters(host=rabbitmq_host, port=rabbitmq_port)
+)
 channel = connection.channel()
 
 # Declare the queue

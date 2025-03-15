@@ -1,12 +1,17 @@
+import os
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-import os
 
-DATABASE_URL = "postgresql+asyncpg://devops:devops24@localhost:5432/user_service"
+DB_USER = os.getenv("POSTGRES_USER", "devops")  
+DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "devops24")
+DB_HOST = os.getenv("POSTGRES_HOST", "postgresql") 
+DB_NAME = os.getenv("POSTGRES_DB", "user_service")  
 
-#engine is the actual conn to the db
+DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}"
+
+# Engine is the actual connection to the DB
 engine = create_async_engine(DATABASE_URL, echo=True) 
-#db session for handling queries
+# DB session for handling queries
 AsyncSessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
 async def get_db():

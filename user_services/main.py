@@ -12,7 +12,7 @@ from decimal import Decimal
 import logging
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
-import httpx  # To make API requests in FastAPI
+import httpx  
 
 logging.basicConfig(
     filename="user_service.log",  # Store logs in a file
@@ -26,7 +26,8 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5500"], 
+    allow_origins=["http://localhost:5500", 
+    "http://frontend:5500"],
     allow_credentials=True,
     allow_methods=["*"],  
     allow_headers=["*"],  
@@ -109,7 +110,7 @@ async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     
 @app.get("/users/events/")
 async def get_events():
-    events_url = "http://localhost:8080/api/events" 
+    events_url = "http://event_service:8080/api/events" 
     logger.info("Fetching events from event service.")
     try:
         async with httpx.AsyncClient() as client:
@@ -145,7 +146,7 @@ async def create_booking(booking: BookingRequest, db: AsyncSession = Depends(get
         async with httpx.AsyncClient() as client:
             logger.info(f"Calling booking API for user {booking.user_id}")
             booking_response = await client.post(
-                "http://127.0.0.1:5000/bookings", json=booking.dict()
+                "http://booking_service:5000/bookings", json=booking.dict()
             )
             booking_response.raise_for_status()
             booking_data = booking_response.json()

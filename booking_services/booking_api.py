@@ -6,6 +6,8 @@ from flask_cors import CORS
 import requests
 import pika
 import json
+import os
+from dotenv import load_dotenv
 
 # Configure logging
 logging.basicConfig(
@@ -16,11 +18,16 @@ logging.basicConfig(
 )
 logger = logging.getLogger("BookingService")
 
+load_dotenv()
+
 app = Flask(__name__)
-CORS(app, origins=["http://127.0.0.1:5500"])
+CORS(app, origins=["http://localhost:5500", "http://frontend:5500"])
 
 # Configure PostgreSQL database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://devops:devops24@localhost:5432/booking_service'
+app.config['SQLALCHEMY_DATABASE_URI'] = (
+    f"postgresql://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}"
+    f"@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}"
+)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -47,7 +54,7 @@ def create_booking():
     logger.info(f"Received booking request for event {event_id} by user {data['user_id']}")
 
     # Step 1: Check and Reserve Tickets in Event API
-    event_api_url = f"http://localhost:8080/api/events/{event_id}/reserve-tickets"
+    event_api_url = f"http://event_service:8080/api/events/{event_id}/reserve-tickets"
     response = requests.post(event_api_url, json={"requestedTickets": requested_tickets})
 
     if response.status_code != 200 or not response.json():
@@ -57,7 +64,7 @@ def create_booking():
     logger.info(f"Successfully reserved {requested_tickets} tickets for event {event_id}")
 
     # Step 2: Verify Payment
-    payment_api_url = "http://localhost:5002/verify-payment"
+    payment_api_url = "http://payment_service:5002/verify-payment"
     payment_response = requests.post(payment_api_url, json={"user_id": data['user_id'], "amount": data.get("price", 0)})
 
     if payment_response.status_code != 200:
@@ -142,7 +149,11 @@ def update_booking_status(booking_id):
 
 def publish_notification(user_id, booking_id):
     try:
-        connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+        rabbitmq_host = os.getenv("RABBITMQ_HOST", "rabbitmq")
+        rabbitmq_port = int(os.getenv("RABBITMQ_PORT", 5672))
+
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host=rabbitmq_host, port=rabbitmq_port))
         channel = connection.channel()
         channel.queue_declare(queue='notifications')
 
@@ -155,5 +166,5 @@ def publish_notification(user_id, booking_id):
     except Exception as e:
         logger.error(f"Failed to send notification for booking {booking_id}: {e}")
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
