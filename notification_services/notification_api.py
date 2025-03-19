@@ -28,6 +28,10 @@ notification_model = api.model("Notification", {
     "user_id": fields.Integer(required=True, description="User ID")
 })
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify(status="ok"), 200
+
 @api.route("/notifications")
 class NotificationResource(Resource):
     @api.expect(notification_model)

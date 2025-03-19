@@ -11,8 +11,15 @@ notifications = db["notification"]
 # Connect to RabbitMQ
 rabbitmq_host = os.getenv("RABBITMQ_HOST", "rabbitmq")
 rabbitmq_port = int(os.getenv("RABBITMQ_PORT", 5672))
+rabbitmq_user = os.getenv("RABBITMQ_DEFAULT_USER", "guest")  
+rabbitmq_pass = os.getenv("RABBITMQ_DEFAULT_PASS", "guest")
+
+# Set credentials for authentication
+credentials = pika.PlainCredentials(rabbitmq_user, rabbitmq_pass)
+
+# Connect to RabbitMQ with authentication
 connection = pika.BlockingConnection(
-    pika.ConnectionParameters(host=rabbitmq_host, port=rabbitmq_port)
+    pika.ConnectionParameters(host=rabbitmq_host, port=rabbitmq_port, credentials=credentials)
 )
 channel = connection.channel()
 

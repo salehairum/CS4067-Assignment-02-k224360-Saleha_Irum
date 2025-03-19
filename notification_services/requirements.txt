@@ -2,8 +2,6 @@ Flask
 flask-pymongo
 flask-cors
 flask-restx
-pymongo
-bson
 pika
 pymongo
 jsonschema

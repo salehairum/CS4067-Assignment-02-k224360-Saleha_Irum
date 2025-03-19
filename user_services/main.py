@@ -33,6 +33,10 @@ app.add_middleware(
     allow_headers=["*"],  
 )
 
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
 @app.get("/")
 async def read_root():
     logger.info("Root endpoint accessed.")
@@ -65,22 +69,23 @@ async def get_users(db: AsyncSession = Depends(get_db)):
 
 @app.post("/login/")
 async def login(user: LoginRequest, db: AsyncSession = Depends(get_db)):
-    logger.info(f"Login attempt for username: {user.username}")
+    logger.info(f"Login attempt for username: {user.username}, password: {user.password}")
     try:
         result = await db.execute(select(User).where(User.username == user.username))
         db_user = result.scalars().first()
-        if not db_user or db_user.password != user.password:  # Ideally use hashing
+        if not db_user or db_user.password != user.password:  
             raise HTTPException(status_code=401, detail="Invalid username or password")
 
         logger.info(f"User {user.username} logged in successfully.")
         return {"username": db_user.username, "balance": db_user.balance, "id": db_user.id}
     
     except HTTPException as http_err:
+        logger.error(f"HTTP Exception: {http_err.detail}")
         raise http_err  
 
     except Exception as e:
-        logger.error(f"Login error for {user.username}: {str(e)}")
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        logger.exception(f"Unhandled exception occurred {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 
 # API Endpoint to Create a User

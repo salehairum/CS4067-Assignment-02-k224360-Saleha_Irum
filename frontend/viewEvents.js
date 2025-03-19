@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     try {
         // Call User API instead of Event Service directly
-        const response = await fetch("http://event_service:8000/users/events/");
+        const response = await fetch("/api/user/users/events/");
         if (!response.ok) throw new Error("Failed to fetch events");
 
         const events = await response.json();
@@ -49,7 +49,7 @@ function updateNotificationCount(count) {
 
 async function fetchNotificationCount(userId) {
     try {
-        const response = await fetch(`http://notification_service:5001/notifications/${userId}/count`);
+        const response = await fetch(`/api/notification/notifications/${userId}/count`);
         if (!response.ok) {
             throw new Error("Failed to fetch notification count");
         }
@@ -94,7 +94,7 @@ function bookEvent(eventId) {
 async function getTicketPrice(eventId) {
     try {
         console.log(eventId);
-        const response = await fetch(`http://event_service:8080/api/events/${eventId}/price`);
+        const response = await fetch(`/api/event/api/events/${eventId}/price`);
         if (!response.ok) throw new Error("Failed to get ticket price");
 
         const price = await response.json();
@@ -124,7 +124,7 @@ async function confirmBooking(eventId) {
 
         const totalCost = ticketPrice * ticketCount;
         const id = parseInt(getUserId().id, 10);
-        const response = await fetch("http://booking_service:8000/users/bookings/", {
+        const response = await fetch("/api/user/users/bookings/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

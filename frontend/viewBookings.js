@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         // Call User API instead of Event Service directly
 
         const id = parseInt(getUserId().id, 10);
-        const response = await fetch(`http://booking_service:5000/bookings/user/${id}`);
+        const response = await fetch(`/api/booking/bookings/user/${id}`);
         if (!response.ok) throw new Error("Failed to fetch bookings");
 
         const bookings = await response.json();
@@ -48,7 +48,7 @@ function updateNotificationCount(count) {
 
 async function fetchNotificationCount(userId) {
     try {
-        const response = await fetch(`http://notification_service:5001/notifications/${userId}/count`);
+        const response = await fetch(`/api/notification/notifications/${userId}/count`);
         if (!response.ok) {
             throw new Error("Failed to fetch notification count");
         }

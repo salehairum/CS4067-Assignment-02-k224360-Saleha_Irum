@@ -9,6 +9,8 @@ import json
 import os
 from dotenv import load_dotenv
 
+from database import app, db
+
 # Configure logging
 logging.basicConfig(
     filename="booking_service.log",
@@ -20,17 +22,7 @@ logger = logging.getLogger("BookingService")
 
 load_dotenv()
 
-app = Flask(__name__)
 CORS(app, origins=["http://localhost:5500", "http://frontend:5500"])
-
-# Configure PostgreSQL database
-app.config['SQLALCHEMY_DATABASE_URI'] = (
-    f"postgresql://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}"
-    f"@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}"
-)
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-db = SQLAlchemy(app)
 
 # Define Booking model
 class Booking(db.Model):
@@ -43,6 +35,10 @@ class Booking(db.Model):
 # Create tables before the first request
 with app.app_context():
     db.create_all()
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify(status="ok"), 200
 
 # Route to create a new booking
 @app.route('/bookings', methods=['POST'])
@@ -151,9 +147,16 @@ def publish_notification(user_id, booking_id):
     try:
         rabbitmq_host = os.getenv("RABBITMQ_HOST", "rabbitmq")
         rabbitmq_port = int(os.getenv("RABBITMQ_PORT", 5672))
+        rabbitmq_user = os.getenv("RABBITMQ_DEFAULT_USER", "guest")  # Default guest
+        rabbitmq_pass = os.getenv("RABBITMQ_DEFAULT_PASS", "guest")
 
+        # Set credentials for authentication
+        credentials = pika.PlainCredentials(rabbitmq_user, rabbitmq_pass)
+
+        # Connect to RabbitMQ with authentication
         connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host=rabbitmq_host, port=rabbitmq_port))
+            pika.ConnectionParameters(host=rabbitmq_host, port=rabbitmq_port, credentials=credentials)
+        )
         channel = connection.channel()
         channel.queue_declare(queue='notifications')
 

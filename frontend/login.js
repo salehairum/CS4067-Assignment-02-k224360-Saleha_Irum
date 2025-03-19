@@ -6,7 +6,7 @@ document.querySelector("form").addEventListener("submit", async function (event)
 
     try {
         // Send POST request to FastAPI backend
-        const response = await fetch("http://user_service:8000/login/", {
+        const response = await fetch("/api/user/login/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
