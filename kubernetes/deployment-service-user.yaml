@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: user-pod
-          image: salehaa/user_service:1.0.0  
+          image: salehaa/user_service
           ports:
             - containerPort: 8000
           env:

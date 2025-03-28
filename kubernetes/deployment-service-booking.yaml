@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: booking-pod
-          image: salehaa/booking_service:1.0.0  
+          image: salehaa/booking_service
           ports:
             - containerPort: 5000
           env:

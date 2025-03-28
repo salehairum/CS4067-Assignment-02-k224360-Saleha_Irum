@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: notification-pod
-          image: salehaa/notification_service:1.0.0  
+          image: salehaa/notification_service  
           ports:
             - containerPort: 5000
           env:

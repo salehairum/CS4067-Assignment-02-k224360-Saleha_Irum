@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: payment-pod
-          image: salehaa/payment_service:1.0.0  
+          image: salehaa/payment_service 
           ports:
             - containerPort: 5000
 ---
