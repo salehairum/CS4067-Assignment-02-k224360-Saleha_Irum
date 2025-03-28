@@ -30,3 +30,22 @@ spec:
       volumes:
         - name: rabbitmq-data
           emptyDir: {} # Data will be lost if the pod restarts (use PersistentVolume for persistence)
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-service
+  namespace: online-event-booking-saleha-irum
+spec:
+  selector:
+    app: rabbitmq
+  ports:
+    - name: amqp
+      protocol: TCP
+      port: 5672    # Messaging service port
+      targetPort: 5672
+    - name: management
+      protocol: TCP
+      port: 15672   # Management UI port
+      targetPort: 15672
+  type: ClusterIP # Change to LoadBalancer if external access is needed
