@@ -87,7 +87,7 @@ function bookEvent(eventId) {
         modal.style.display = "none";
     });
     document.getElementById("confirmBooking").onclick = function () {
-        confirmBooking(eventId);
+        confirmBooking(parseInt(eventId), 10);
     };
 }
 
@@ -108,7 +108,7 @@ async function getTicketPrice(eventId) {
 async function confirmBooking(eventId) {
     document.getElementById("processBooking").style.display = "block";
 
-    const ticketCount = document.getElementById("ticketCount").value;
+    const ticketCount = parseInt(document.getElementById("ticketCount").value, 10);
 
     if (ticketCount < 1) {
         alert("Please select at least one ticket.");
@@ -124,6 +124,8 @@ async function confirmBooking(eventId) {
 
         const totalCost = ticketPrice * ticketCount;
         const id = parseInt(getUserId().id, 10);
+        console.log(`event id is ${eventId}`);
+        console.log(`ticketCount is ${ticketCount}`);
         const response = await fetch("/api/user/users/bookings/", {
             method: "POST",
             headers: {

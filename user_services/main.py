@@ -115,7 +115,7 @@ async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     
 @app.get("/users/events/")
 async def get_events():
-    events_url = "http://event_service:8080/api/events" 
+    events_url = "http://event-service:8080/api/events" 
     logger.info("Fetching events from event service.")
     try:
         async with httpx.AsyncClient() as client:
@@ -132,7 +132,7 @@ async def get_events():
 
 @app.post("/users/bookings/")
 async def create_booking(booking: BookingRequest, db: AsyncSession = Depends(get_db)):
-    logger.info(f"Received booking request for user {booking.user_id} and event {booking.event_id}")
+    logger.info(f"------------Received booking request for user {booking.user_id} and event {booking.event_id}")
     # Step 1: Get User from Database
     result = await db.execute(select(User).where(User.id == booking.user_id))
     db_user = result.scalars().first()
@@ -149,9 +149,9 @@ async def create_booking(booking: BookingRequest, db: AsyncSession = Depends(get
     # Step 3: Call Booking API to Create Booking
     try:
         async with httpx.AsyncClient() as client:
-            logger.info(f"Calling booking API for user {booking.user_id}")
+            logger.info(f"------------Calling booking API for user {booking.user_id}")
             booking_response = await client.post(
-                "http://booking_service:5000/bookings", json=booking.dict()
+                "http://booking-service:5000/bookings", json=booking.dict()
             )
             booking_response.raise_for_status()
             booking_data = booking_response.json()

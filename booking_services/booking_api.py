@@ -17,6 +17,7 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S"
+    
 )
 logger = logging.getLogger("BookingService")
 
@@ -47,10 +48,10 @@ def create_booking():
     event_id = data['event_id']
     requested_tickets = data['ticket_count']
 
-    logger.info(f"Received booking request for event {event_id} by user {data['user_id']}")
+    logger.info(f"------------Received booking request for event {event_id} by user {data['user_id']}")
 
     # Step 1: Check and Reserve Tickets in Event API
-    event_api_url = f"http://event_service:8080/api/events/{event_id}/reserve-tickets"
+    event_api_url = f"http://event-service:8080/api/events/{event_id}/reserve-tickets"
     response = requests.post(event_api_url, json={"requestedTickets": requested_tickets})
 
     if response.status_code != 200 or not response.json():
@@ -60,7 +61,7 @@ def create_booking():
     logger.info(f"Successfully reserved {requested_tickets} tickets for event {event_id}")
 
     # Step 2: Verify Payment
-    payment_api_url = "http://payment_service:5002/verify-payment"
+    payment_api_url = "http://payment-service:5000/verify-payment"
     payment_response = requests.post(payment_api_url, json={"user_id": data['user_id'], "amount": data.get("price", 0)})
 
     if payment_response.status_code != 200:

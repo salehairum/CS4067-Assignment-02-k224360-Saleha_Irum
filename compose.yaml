@@ -1,46 +1,48 @@
 services:
-  user_service:
+  user-service:
     build: ./user_services
     ports:
       - "8000:8000"
     depends_on:
       postgresql:
-        condition: service_healthy
+        condition: service_started
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_PORT=${POSTGRES_PORT}
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://user_service:8000/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    # healthcheck:
+    #   test: [ "CMD", "curl", "-f", "http://user-service:8000/health" ]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    restart: always
 
-  event_service:
+  event-service:
     build: ./event_services
     ports:
       - "8080:8080"
     depends_on:
       mongodb:
-        condition: service_healthy
+        condition: service_started
     environment:
       - MONGO_URI=mongodb://mongodb:27017/event_services
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://event_service:8080/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    # healthcheck:
+    #   test: [ "CMD", "curl", "-f", "http://event-service:8080/health" ]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    restart: always
 
-  booking_service:
+  booking-service:
     build: ./booking_services
     ports:
       - "5000:5000"
     depends_on:
       postgresql:
-        condition: service_healthy
+        condition: service_started
       rabbitmq:
-        condition: service_healthy
+        condition: service_started
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -50,65 +52,67 @@ services:
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
       - RABBITMQ_HOST=${RABBITMQ_HOST}
       - RABBITMQ_PORT=${RABBITMQ_PORT}
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://booking_service:5000/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    # healthcheck:
+    #   test: [ "CMD", "curl", "-f", "http://booking-service:5000/health" ]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    restart: always
 
-  notification_service:
+  notification-service:
     build: ./notification_services
     ports:
       - "5001:5000"
     depends_on:
       mongodb:
-        condition: service_healthy
+        condition: service_started
       rabbitmq:
-        condition: service_healthy
+        condition: service_started
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/notification_service
+      - MONGO_URI=mongodb://mongodb:27017/notification-service
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
       - RABBITMQ_HOST=${RABBITMQ_HOST}
       - RABBITMQ_PORT=${RABBITMQ_PORT}
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://notification_service:5000/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    # healthcheck:
+    #   test: [ "CMD", "curl", "-f", "http://notification-service:5000/health" ]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
     command: [ "sh", "-c", "python3 notification_api.py & python3 consumer.py" ]
-
-  payment_service:
+    restart: always
+  payment-service:
     build: ./payment_services
     ports:
       - "5002:5000"
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://payment_service:5000/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
+    # healthcheck:
+    #   test: [ "CMD", "curl", "-f", "http://payment-service:5000/health" ]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 30s
+    restart: always
   frontend:
     build: ./frontend
     ports:
       - "80:80"
     depends_on:
-      user_service:
-        condition: service_healthy
-      event_service:
-        condition: service_healthy
-      booking_service:
-        condition: service_healthy
-      notification_service:
-        condition: service_healthy
-      payment_service:
+      user-service:
+        condition: service_started
+      event-service:
+        condition: service_started
+      booking-service:
+        condition: service_started
+      notification-service:
+        condition: service_started
+      payment-service:
         condition: service_started
       # - user_service
       # - event_service
       # - booking_service
       # - notification_service
       # - payment_service
-
+    restart: always
   postgresql:
     image: postgres:latest
     environment:
@@ -124,12 +128,14 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   mongodb:
     image: mongo:latest
     ports:
       - "27017:27017"
     volumes:
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
       - mongodata:/data/db
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongosh --quiet mongodb:27017
@@ -146,22 +152,12 @@ services:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
       - RABBITMQ_ERLANG_COOKIE=cookie
-    # healthcheck:
-    #   test: [ "CMD-SHELL", "rabbitmq-diagnostics check_running" ]
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 5
-    # healthcheck:
-    #   test: [ "CMD", "rabbitmqctl", "status" ]
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 5
     healthcheck:
       test: [ "CMD", "rabbitmqctl", "status" ]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 30s
+      start_period: 60s
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     restart: always
