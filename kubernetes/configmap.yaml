@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: event-booking-config
-  namespace: OnlineEventBooking-SalehaIrum
+  namespace: online-event-booking-saleha-irum
 data:
   POSTGRES_HOST: "postgresql"
   POSTGRES_PORT: "5432"

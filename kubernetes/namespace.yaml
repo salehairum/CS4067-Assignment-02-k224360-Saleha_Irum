@@ -1,4 +1,4 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: OnlineEventBooking-SalehaIrum
+  name: online-event-booking-saleha-irum
