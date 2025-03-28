@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-deployment
+  namespace: OnlineEventBooking-SalehaIrum
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: booking
+  template:
+    metadata:
+      labels:
+        app: booking
+    spec:
+      containers:
+        - name: booking-pod
+          image: salehaa/booking_service:1.0.0  
+          ports:
+            - containerPort: 5000
+          env:
+            # PostgreSQL ConfigMap values
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: event-booking-config
+                  key: POSTGRES_HOST
+            - name: POSTGRES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: event-booking-config
+                  key: POSTGRES_PORT
+            # PostgreSQL Secrets
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: event-booking-secrets
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: event-booking-secrets
+                  key: POSTGRES_PASSWORD
+            # RabbitMQ ConfigMap values
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: event-booking-config
+                  key: RABBITMQ_HOST
+            - name: RABBITMQ_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: event-booking-config
+                  key: RABBITMQ_PORT
+            # RabbitMQ Secrets
+            - name: RABBITMQ_DEFAULT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: event-booking-secrets
+                  key: RABBITMQ_DEFAULT_USER
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: event-booking-secrets
+                  key: RABBITMQ_DEFAULT_PASS
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: booking
+  namespace: OnlineEventBooking-SalehaIrum
+spec:
+  selector:
+    app: booking
+  ports:
+    - protocol: TCP
+      port: 80   # Exposed service port
+      targetPort: 5000  # Container's port
+  type: ClusterIP

@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-deployment
+  namespace: OnlineEventBooking-SalehaIrum
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: notification
+  template:
+    metadata:
+      labels:
+        app: notification
+    spec:
+      containers:
+        - name: notification-pod
+          image: salehaa/notification_service:1.0.0  
+          ports:
+            - containerPort: 5000
+          env:
+            # RabbitMQ ConfigMap values
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: event-booking-config
+                  key: RABBITMQ_HOST
+            - name: RABBITMQ_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: event-booking-config
+                  key: RABBITMQ_PORT
+            # RabbitMQ Secrets
+            - name: RABBITMQ_DEFAULT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: event-booking-secrets
+                  key: RABBITMQ_DEFAULT_USER
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: event-booking-secrets
+                  key: RABBITMQ_DEFAULT_PASS
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+  namespace: OnlineEventBooking-SalehaIrum
+spec:
+  selector:
+    app: notification
+  ports:
+    - protocol: TCP
+      port: 80   # Exposed service port
+      targetPort: 5000  # Container's port
+  type: ClusterIP

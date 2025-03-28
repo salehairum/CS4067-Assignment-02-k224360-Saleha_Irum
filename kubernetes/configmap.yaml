@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: event-booking-config
+  namespace: OnlineEventBooking-SalehaIrum
+data:
+  POSTGRES_HOST: "postgresql"
+  POSTGRES_PORT: "5432"
+  RABBITMQ_HOST: "rabbitmq"
+  RABBITMQ_PORT: "5672"

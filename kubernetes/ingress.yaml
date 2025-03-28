@@ -1,0 +1,70 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: event-booking-ingress
+  namespace: OnlineEventBooking-SalehaIrum
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: salehairum.com
+      http:
+        paths:
+          # Frontend Service
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-service
+                port:
+                  number: 80
+          # User Service
+          - path: /api/user/
+            pathType: Prefix
+            backend:
+              service:
+                name: user-service
+                port:
+                  number: 8000
+          # Booking Service
+          - path: /api/booking/
+            pathType: Prefix
+            backend:
+              service:
+                name: booking-service
+                port:
+                  number: 5000
+          # Notification Service
+          - path: /api/notification/
+            pathType: Prefix
+            backend:
+              service:
+                name: notification-service
+                port:
+                  number: 5000
+          # Event Service
+          - path: /api/event/
+            pathType: Prefix
+            backend:
+              service:
+                name: event-service
+                port:
+                  number: 8080
+          # Payment Service
+          - path: /api/payment/
+            pathType: Prefix
+            backend:
+              service:
+                name: payment-service
+                port:
+                  number: 5000
+---
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: nginx
+spec:
+  controller: k8s.io/ingress-nginx
+
+# kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.1/deploy/static/provider/cloud/deploy.yaml
