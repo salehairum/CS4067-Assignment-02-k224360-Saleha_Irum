@@ -23,7 +23,7 @@ logger = logging.getLogger("BookingService")
 
 load_dotenv()
 
-CORS(app, origins=["http://localhost:5500", "http://frontend:5500"])
+CORS(app, origins=["http://localhost:5500", "http://frontend:5500", "http://salehairum.com"])
 
 # Define Booking model
 class Booking(db.Model):

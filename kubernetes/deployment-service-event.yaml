@@ -16,6 +16,7 @@ spec:
       containers:
         - name: event-pod
           image: salehaa/event_service
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
 ---
@@ -29,6 +30,6 @@ spec:
     app: event
   ports:
     - protocol: TCP
-      port: 80   # Exposed service port
+      port: 8080  # Exposed service port
       targetPort: 8080  # Container's port
   type: ClusterIP

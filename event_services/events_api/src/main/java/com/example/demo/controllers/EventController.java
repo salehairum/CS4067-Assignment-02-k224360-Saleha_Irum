@@ -19,7 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/events")
-@CrossOrigin(origins = { "http://localhost:5500", "http://frontend:5500" })
+@CrossOrigin(origins = { "http://localhost:5500", "http://frontend:5500","http://salehairum.com" })
 public class EventController {
 
     private static final Logger logger = LoggerFactory.getLogger(EventController.class);

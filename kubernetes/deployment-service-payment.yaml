@@ -15,7 +15,8 @@ spec:
     spec:
       containers:
         - name: payment-pod
-          image: salehaa/payment_service 
+          image: salehaa/payment_service
+          imagePullPolicy: Always 
           ports:
             - containerPort: 5000
 ---
@@ -29,6 +30,6 @@ spec:
     app: payment
   ports:
     - protocol: TCP
-      port: 80   # Exposed service port
+      port: 5000   # Exposed service port
       targetPort: 5000  # Container's port
   type: ClusterIP

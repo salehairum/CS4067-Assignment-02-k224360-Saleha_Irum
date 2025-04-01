@@ -4,4 +4,4 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 EXPOSE 5000
-CMD ["python3", "notification_api.py"] 
+CMD ["sh", "-c", "python3 notification_api.py & python3 consumer.py"]

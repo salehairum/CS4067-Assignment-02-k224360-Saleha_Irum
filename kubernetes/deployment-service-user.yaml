@@ -16,6 +16,7 @@ spec:
       containers:
         - name: user-pod
           image: salehaa/user_service
+          imagePullPolicy: Always
           ports:
             - containerPort: 8000
           env:
@@ -52,6 +53,6 @@ spec:
     app: user
   ports:
     - protocol: TCP
-      port: 80   # Exposed service port
+      port: 8000   # Exposed service port
       targetPort: 8000  # Container's port
   type: ClusterIP 

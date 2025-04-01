@@ -14,7 +14,7 @@ logging.basicConfig(
 )
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:5500", "http://frontend:5500"])
+CORS(app, origins=["http://localhost:5500", "http://frontend:5500", "http://salehairum.com"])
 api = Api(app, title="Notification Service API", description="API for managing notifications", doc="/")
 
 # Configure MongoDB

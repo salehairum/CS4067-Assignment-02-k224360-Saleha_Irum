@@ -16,6 +16,7 @@ spec:
       containers:
         - name: booking-pod
           image: salehaa/booking_service
+          imagePullPolicy: Always
           ports:
             - containerPort: 5000
           env:
@@ -74,6 +75,6 @@ spec:
     app: booking
   ports:
     - protocol: TCP
-      port: 80   # Exposed service port
+      port: 5000   # Exposed service port
       targetPort: 5000  # Container's port
   type: ClusterIP
