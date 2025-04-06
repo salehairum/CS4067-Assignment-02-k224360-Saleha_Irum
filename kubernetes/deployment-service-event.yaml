@@ -30,6 +30,6 @@ spec:
     app: event
   ports:
     - protocol: TCP
-      port: 8080  # Exposed service port
+      port: 8081  # Exposed service port
       targetPort: 8080  # Container's port
   type: ClusterIP

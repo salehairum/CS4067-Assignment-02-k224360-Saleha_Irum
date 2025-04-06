@@ -64,6 +64,6 @@ spec:
     app: postgresql  # This should match the labels in your Deployment
   ports:
     - protocol: TCP
-      port: 5432  # Port for communication
+      port: 5433  # Port for communication
       targetPort: 5432  # Matches containerPort in Deployment
   type: ClusterIP  # Keeps it accessible within the cluster

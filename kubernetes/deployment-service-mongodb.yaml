@@ -54,6 +54,6 @@ spec:
     app: mongodb
   ports:
     - protocol: TCP
-      port: 27017
+      port: 27018
       targetPort: 27017
   type: ClusterIP 

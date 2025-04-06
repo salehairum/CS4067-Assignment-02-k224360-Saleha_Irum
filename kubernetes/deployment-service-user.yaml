@@ -53,6 +53,6 @@ spec:
     app: user
   ports:
     - protocol: TCP
-      port: 8000   # Exposed service port
+      port: 8001   # Exposed service port
       targetPort: 8000  # Container's port
   type: ClusterIP 

@@ -30,6 +30,6 @@ spec:
     app: frontend
   ports:
     - protocol: TCP
-      port: 80   # Exposed service port
+      port: 82   # Exposed service port
       targetPort: 80  # Container's port
   type: ClusterIP

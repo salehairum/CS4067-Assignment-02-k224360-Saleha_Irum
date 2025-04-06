@@ -75,6 +75,6 @@ spec:
     app: booking
   ports:
     - protocol: TCP
-      port: 5000   # Exposed service port
+      port: 5003   # Exposed service port
       targetPort: 5000  # Container's port
   type: ClusterIP

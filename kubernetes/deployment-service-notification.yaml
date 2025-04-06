@@ -53,6 +53,6 @@ spec:
     app: notification
   ports:
     - protocol: TCP
-      port: 5000   # Exposed service port
+      port: 5004   # Exposed service port
       targetPort: 5000  # Container's port
   type: ClusterIP
