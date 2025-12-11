@@ -1,7 +1,0 @@
-Flask
-flask-pymongo
-flask-cors
-flask-restx
-pika
-pymongo
-jsonschema
