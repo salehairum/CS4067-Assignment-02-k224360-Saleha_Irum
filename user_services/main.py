@@ -180,3 +180,6 @@ async def create_booking(booking: BookingRequest, db: AsyncSession = Depends(get
         "booking_id": booking_data["booking_id"],
         "remaining_balance": db_user.balance
     }
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8001)
