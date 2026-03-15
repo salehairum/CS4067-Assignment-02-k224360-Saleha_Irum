@@ -8,8 +8,11 @@ import pika
 import json
 import os
 from dotenv import load_dotenv
+from flask import Blueprint
 
 from database import app, db
+booking_bp = Blueprint("booking", __name__, url_prefix="/api")
+app.register_blueprint(booking_bp)
 
 # Configure logging
 logging.basicConfig(
@@ -24,7 +27,6 @@ logger = logging.getLogger("BookingService")
 load_dotenv()
 
 CORS(app, origins=["http://localhost:5500", "http://frontend:5500", "http://salehairum.com"])
-
 # Define Booking model
 class Booking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -37,12 +39,12 @@ class Booking(db.Model):
 with app.app_context():
     db.create_all()
 
-@app.route('/health', methods=['GET'])
+@booking_bp.route('/health', methods=['GET'])
 def health_check():
     return jsonify(status="ok"), 200
 
 # Route to create a new booking
-@app.route('/bookings', methods=['POST'])
+@booking_bp.route('/bookings', methods=['POST'])
 def create_booking():
     data = request.get_json()
     event_id = data['event_id']
@@ -82,7 +84,7 @@ def create_booking():
     return jsonify({"message": "Booking created", "booking_id": new_booking.id}), 201
 
 # Route to get all bookings
-@app.route('/bookings', methods=['GET'])
+@booking_bp.route('/bookings', methods=['GET'])
 def get_all_bookings():
     logger.info("Fetching all bookings")
     bookings = Booking.query.all()
@@ -100,7 +102,7 @@ def get_all_bookings():
     return jsonify(all_bookings), 200
 
 # Route to get all bookings for a specific user
-@app.route('/bookings/user/<int:user_id>', methods=['GET'])
+@booking_bp.route('/bookings/user/<int:user_id>', methods=['GET'])
 def get_bookings_by_user(user_id):
     logger.info(f"Fetching bookings for user {user_id}")
     bookings = Booking.query.filter_by(user_id=user_id).all()
@@ -124,7 +126,7 @@ def get_bookings_by_user(user_id):
     return jsonify(user_bookings), 200
 
 # Route to update the status of a booking
-@app.route('/bookings/<int:booking_id>/status', methods=['PATCH'])
+@booking_bp.route('/bookings/<int:booking_id>/status', methods=['PATCH'])
 def update_booking_status(booking_id):
     data = request.get_json()
 
