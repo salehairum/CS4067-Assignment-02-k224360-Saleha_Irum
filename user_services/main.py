@@ -13,6 +13,31 @@ import logging
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 import httpx  
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+def _parse_origins(origins_value: str):
+    return [origin.strip() for origin in origins_value.split(",") if origin.strip()]
+
+
+def _get_required_env(name: str) -> str:
+    value = os.getenv(name)
+    if not value:
+        raise RuntimeError(f"Missing required environment variable: {name}")
+    return value
+
+
+EVENTS_SERVICE_URL = _get_required_env("EVENTS_SERVICE_URL")
+BOOKING_SERVICE_URL = _get_required_env("BOOKING_SERVICE_URL")
+CORS_ALLOW_ORIGINS = _parse_origins(
+    os.getenv(
+        "CORS_ALLOW_ORIGINS",
+        "http://localhost:5500,http://frontend:5500,http://salehairum.com",
+    )
+)
 
 logging.basicConfig(
     filename="user_service.log",  # Store logs in a file
@@ -26,9 +51,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5500", 
-    "http://frontend:5500",
-    "http://salehairum.com"],
+    allow_origins=CORS_ALLOW_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],  
     allow_headers=["*"],  
@@ -116,7 +139,7 @@ async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     
 @app.get("/users/events/")
 async def get_events():
-    events_url = "http://event-service:8080/api/events" 
+    events_url = EVENTS_SERVICE_URL
     logger.info("Fetching events from event service.")
     try:
         async with httpx.AsyncClient() as client:
@@ -152,7 +175,7 @@ async def create_booking(booking: BookingRequest, db: AsyncSession = Depends(get
         async with httpx.AsyncClient() as client:
             logger.info(f"------------Calling booking API for user {booking.user_id}")
             booking_response = await client.post(
-                "http://booking-service:5000/bookings", json=booking.dict()
+                BOOKING_SERVICE_URL, json=booking.dict()
             )
             booking_response.raise_for_status()
             booking_data = booking_response.json()
