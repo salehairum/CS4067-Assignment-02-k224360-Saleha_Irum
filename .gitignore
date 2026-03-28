@@ -12,3 +12,9 @@ __pycache__/
 # Ignore other files
 .DS_Store  # MacOS
 *.log
+
+Dockerfile
+kubernetes/
+Terraform/
+Ansible/
+.github/workflows/
