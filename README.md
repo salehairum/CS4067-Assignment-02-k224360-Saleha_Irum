@@ -1,5 +1,5 @@
 # Online Event Booking System
-A polyglot application.
+A polyglot application
 
 ## Tech Stacks
 - User Service: FastAPI/PostgreSQL
