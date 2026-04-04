@@ -1,4 +1,6 @@
 # Online Event Booking System
+A polyglot application.
+
 ## Tech Stacks
 - User Service: FastAPI/PostgreSQL
 - Event Service: Springboot/MongoDB
