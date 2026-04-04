@@ -8,7 +8,7 @@ A polyglot application.
 - Notification Service: Flask/MongoDB
 - Payment Service(mock): Flask
 - Frontend: HTML, CSS, JS
-- Communications: REST API(Sync), RabbitMQ(Async)
+- Communications: REST API (Sync), RabbitMQ (Async)
 
 ## API Documentation
 - User Service: http://127.0.0.1:8000/docs
