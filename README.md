@@ -13,6 +13,7 @@
 - Event Service: http://localhost:8080/swagger-ui/index.html
 - Booking Service: http://127.0.0.1:5000/
 - Notification Service: http://127.0.0.1:5001/
+- Payment Service: http://127.0.0.1:5002/
 
 ## Setup Guide
 - Run user service using uvicorn main:app --reload
